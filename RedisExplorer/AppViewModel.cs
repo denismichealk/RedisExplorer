@@ -2,6 +2,8 @@
 using System.ComponentModel.Composition;
 using System.Dynamic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 using Caliburn.Micro;
@@ -65,7 +67,7 @@ namespace RedisExplorer
             DatabaseViewModel = new DatabaseViewModel(eventAggregator);
             DatabaseViewModel.ConductWith(this);
 
-            ActivateItem(DefaultViewModel);
+             ActivateItemAsync(DefaultViewModel);
 
 
             LoadServers();
@@ -123,7 +125,7 @@ namespace RedisExplorer
         }
 
 
-        public void AddServer()
+        public async Task AddServer()
         {
             dynamic settings = new ExpandoObject();
             settings.Width = 400;
@@ -131,10 +133,10 @@ namespace RedisExplorer
             settings.WindowStartupLocation = WindowStartupLocation.Manual;
             settings.Title = "Add Server";
 
-            windowManager.ShowWindow(new AddConnectionViewModel(eventAggregator), null, settings);    
+            await windowManager.ShowWindowAsync(new AddConnectionViewModel(eventAggregator), null, settings);    
         }
 
-        public void Preferences()
+        public async Task Preferences()
         {
             dynamic settings = new ExpandoObject();
             settings.Width = 400;
@@ -142,18 +144,18 @@ namespace RedisExplorer
             settings.WindowStartupLocation = WindowStartupLocation.Manual;
             settings.Title = "Preferences";
 
-            windowManager.ShowWindow(new PreferencesViewModel(eventAggregator), null, settings);    
+           await windowManager.ShowWindowAsync(new PreferencesViewModel(eventAggregator), null, settings);    
         }
 
-        public void About()
+        public async Task About()
         {
-            ActivateItem(DefaultViewModel);
+            await ActivateItemAsync(DefaultViewModel);
             StatusBarTextBlock = string.Empty;
         }
 
         #endregion
 
-        public void Handle(AddConnectionMessage message)
+        public async Task HandleAsync(AddConnectionMessage message, CancellationToken ct)
         {
             StringCollection connections = Settings.Default.Servers ?? new StringCollection();
 
@@ -174,86 +176,86 @@ namespace RedisExplorer
             LoadServers();
         }
 
-        public void Handle(DeleteConnectionMessage message)
+        public async Task HandleAsync(DeleteConnectionMessage message, CancellationToken ct)
         {
             StatusBarTextBlock = "Connection Deleted";
             LoadServers();
         }
 
-        public void Handle(RedisKeyAddedMessage message)
+        public async Task HandleAsync(RedisKeyAddedMessage message, CancellationToken ct)
         {
             StatusBarTextBlock = "Added Key : " + message.Key.KeyName;
         }
 
-        public void Handle(ConnectionFailedMessage message)
+        public async Task HandleAsync(ConnectionFailedMessage message, CancellationToken ct)
         {
             StatusBarTextBlock = "Could not connect : " + message.ErrorMessage;
         }
 
-        public void Handle(InfoNotValidMessage message)
+        public async Task HandleAsync(InfoNotValidMessage message, CancellationToken ct)
         {
             StatusBarTextBlock = "Could not query database counts.";
         }
 
-        public void Handle(RedisKeyUpdatedMessage message)
+        public async Task HandleAsync(RedisKeyUpdatedMessage message, CancellationToken ct)
         {
             StatusBarTextBlock = "Updated Key : " + message.Key.KeyName;
         }
 
-        public void Handle(ReloadKeyMessage message)
+        public async Task HandleAsync(ReloadKeyMessage message, CancellationToken ct)
         {
             StatusBarTextBlock = "Reloaded Key : " + message.Urn;
         }
 
-        public void Handle(ServerReloadMessage message)
+        public async Task HandleAsync(ServerReloadMessage message, CancellationToken ct)
         {
             StatusBarTextBlock = "Reload Server : " + message.Name;
         }
 
-        public void Handle(KeyDeletedMessage message)
+        public async Task HandleAsync(KeyDeletedMessage message, CancellationToken ct)
         {
             StatusBarTextBlock = "Deleted Key : " + message.Key.KeyName;
         }
 
-        public void Handle(KeysDeletedMessage message)
+        public async Task HandleAsync(KeysDeletedMessage message, CancellationToken ct)
         {
             StatusBarTextBlock = "Deleted " + message.Keys.Count + " Keys";
         }
 
-        public void Handle(DatabaseReloadMessage message)
+        public async Task HandleAsync(DatabaseReloadMessage message, CancellationToken ct)
         {
             StatusBarTextBlock = "Reloaded Database : " + message.DbNumber;
         }
 
-        public void Handle(TreeItemSelectedMessage message)
+        public async Task HandleAsync(TreeItemSelectedMessage message,CancellationToken ct)
         {
             if (message.SelectedItem is RedisServer)
             {
-                ActivateItem(ServerViewModel);
+                await ActivateItemAsync(ServerViewModel);
                 StatusBarTextBlock = "Connecting to server : " + message.SelectedItem.Display;
             }
             else if (message.SelectedItem is RedisDatabase)
             {
-                ActivateItem(DatabaseViewModel);
+                await ActivateItemAsync(DatabaseViewModel);
                 StatusBarTextBlock = "Selected Database : " + message.SelectedItem.Display;
             }
             else
             {
-                ActivateItem(KeyViewModel);
+                await ActivateItemAsync(KeyViewModel);
                 StatusBarTextBlock = "Selected : " + message.SelectedItem.Display;
             }
         }
 
-        public void Handle(TreeItemExpandedMessage message)
+        public async Task HandleAsync(TreeItemExpandedMessage message,CancellationToken ct)
         {
             StatusBarTextBlock = "Expanded : " + message.SelectedItem.Display;
         }
 
-        public void Handle(AddKeyMessage message)
+        public async Task HandleAsync(AddKeyMessage message, CancellationToken ct)
         {
             if (!ActiveItem.Equals(KeyViewModel))
             {
-                ActivateItem(KeyViewModel);
+                await ActivateItemAsync(KeyViewModel);
             }
         }
     }
