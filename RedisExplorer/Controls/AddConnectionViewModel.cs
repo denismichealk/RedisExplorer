@@ -82,12 +82,12 @@ namespace RedisExplorer.Controls
 
             await eventAggregator.PublishOnUIThreadAsync(new AddConnectionMessage { Connection = connection });
 
-            TryClose();
+            TryCloseAsync();
         }
 
-        public void CancelButton()
+        public async void CancelButton()
         {
-            TryClose();
+            await TryCloseAsync();
         }
 
         #endregion

@@ -112,7 +112,7 @@ namespace RedisExplorer.Controls
             SelectedAccent = Settings.Default.Accent;
         }
 
-        public void SaveButton()
+        public async void SaveButton()
         {
             SaveSettings();
 
@@ -120,7 +120,7 @@ namespace RedisExplorer.Controls
                                         ThemeManager.GetAccent(SelectedAccent), 
                                         ThemeManager.GetAppTheme(SelectedTheme));
 
-            TryClose();
+            await TryCloseAsync();
         }
 
         public void ApplyButton()
@@ -130,9 +130,9 @@ namespace RedisExplorer.Controls
             ChangeTheme();
         }
 
-        public void CancelButton()
+        public async void CancelButton()
         {
-            TryClose();
+           await  TryCloseAsync();
         }
 
         private void ChangeTheme()
