@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using RedisExplorer.Messages;
 using StackExchange.Redis;
@@ -205,7 +205,7 @@ namespace RedisExplorer.Models
             return false;
         }
 
-        public virtual async void Reload()
+        public virtual async Task Reload()
         {
             //var db = Database;
 

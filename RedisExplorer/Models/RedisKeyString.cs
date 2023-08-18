@@ -1,6 +1,7 @@
 ﻿using Caliburn.Micro;
 using RedisExplorer.Interface;
 using StackExchange.Redis;
+using System.Threading.Tasks;
 
 namespace RedisExplorer.Models
 {
@@ -48,10 +49,10 @@ namespace RedisExplorer.Models
             return true;
         }
 
-        public override void Reload()
+        public override async Task Reload()
         {
             KeyValue = string.Empty;
-            base.Reload();
+            await base.Reload();
         }
     }
 }

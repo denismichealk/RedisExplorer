@@ -290,7 +290,7 @@ namespace RedisExplorer.Controls
             {
                 return;
             }
-            item.Reload();
+            await item.Reload();
 
             await eventAggregator.PublishOnUIThreadAsync(new RedisKeyReloadMessage { Item = item });
 

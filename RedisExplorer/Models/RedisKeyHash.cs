@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using RedisExplorer.Interface;
 
@@ -66,10 +66,10 @@ namespace RedisExplorer.Models
             return true;
         }
 
-        public override void Reload()
+        public override async Task Reload()
         {
             KeyValue = null;
-            base.Reload();
+            await base.Reload();
         }
     }
 }
