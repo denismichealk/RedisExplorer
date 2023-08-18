@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition;
-
+using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 
 using RedisExplorer.Interface;
@@ -48,7 +49,7 @@ namespace RedisExplorer.Controls
             eventAggregator.Subscribe(this);
         }
 
-        public void Handle(TreeItemSelectedMessage message)
+        public async Task HandleAsync(TreeItemSelectedMessage message,CancellationToken ct)
         {
             if (message?.SelectedItem is RedisDatabase)
             {

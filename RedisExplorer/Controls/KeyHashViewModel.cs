@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using RedisExplorer.Interface;
 using RedisExplorer.Messages;
@@ -23,13 +25,13 @@ namespace RedisExplorer.Controls
             }
         }
 
-        protected override void OnActivate()
+        protected override async Task OnActivateAsync(CancellationToken ct)
         {
             if (KeyValue == null)
             {
                 KeyValue = new BindableCollection<HashWrapper>();
             }
-            base.OnActivate();
+            await base.OnActivateAsync(ct);
         }
 
         public KeyHashViewModel(IEventAggregator eventAggregator)
@@ -40,7 +42,7 @@ namespace RedisExplorer.Controls
 
         #region Message Handlers
 
-        public void Handle(TreeItemSelectedMessage message)
+        public async Task HandleAsync(TreeItemSelectedMessage message, CancellationToken ct)
         {
             if (message?.SelectedItem is RedisKeyHash && !message.SelectedItem.HasChildren)
             {
@@ -48,12 +50,12 @@ namespace RedisExplorer.Controls
             }
         }
 
-        public void Handle(AddKeyMessage message)
+        public async Task HandleAsync(AddKeyMessage message, CancellationToken ct)
         {
             KeyValue = new BindableCollection<HashWrapper>();
         }
 
-        public void Handle(RedisKeyReloadMessage message)
+        public async Task HandleAsync(RedisKeyReloadMessage message, CancellationToken ct)
         {
             var redisKeyHash = message.Item as RedisKeyHash;
             if (redisKeyHash != null)

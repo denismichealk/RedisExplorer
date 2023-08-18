@@ -166,15 +166,15 @@ namespace RedisExplorer.Models
             return false;
         }
 
-        public void NotifyOfSave(bool existingKey)
+        public async void NotifyOfSave(bool existingKey)
         {
             if (existingKey)
             {
-                eventAggregator.PublishOnUIThread(new RedisKeyUpdatedMessage { Key = this });
+                await eventAggregator.PublishOnUIThreadAsync(new RedisKeyUpdatedMessage { Key = this });
             }
             else
             {
-                eventAggregator.PublishOnUIThread(new RedisKeyAddedMessage { Key = this });
+                await eventAggregator.PublishOnUIThreadAsync(new RedisKeyAddedMessage { Key = this });
             }
         }
 
@@ -184,7 +184,7 @@ namespace RedisExplorer.Models
             {
                 if (Database.KeyExists(KeyName) && Database.KeyDelete(KeyName))
                 {
-                    eventAggregator.PublishOnUIThread(new KeyDeletedMessage { Key = this });
+                     eventAggregator.PublishOnUIThreadAsync(new KeyDeletedMessage { Key = this });
                     return true;
                 }
             }
@@ -198,26 +198,26 @@ namespace RedisExplorer.Models
 
                 if (result > 0)
                 {
-                    eventAggregator.PublishOnUIThread(new KeysDeletedMessage { DatabaseName = parentdb.GetDatabaseNumber, Keys = keys.Select(x => x.ToString()).ToList() });
+                    eventAggregator.PublishOnUIThreadAsync(new KeysDeletedMessage { DatabaseName = parentdb.GetDatabaseNumber, Keys = keys.Select(x => x.ToString()).ToList() });
                     return true;
                 }
             }
             return false;
         }
 
-        public virtual void Reload()
+        public virtual async void Reload()
         {
             //var db = Database;
 
             KeyType = RedisType.None;
             TTL = null;
 
-            eventAggregator.PublishOnUIThread(new ReloadKeyMessage { Urn = KeyName });
+           await  eventAggregator.PublishOnUIThreadAsync(new ReloadKeyMessage { Urn = KeyName });
         }
 
-        public void Add()
+        public async void Add()
         {
-            eventAggregator.PublishOnUIThread(new AddKeyMessage { ParentDatabase = GetParentDatabase, KeyBase = KeyName });
+           await  eventAggregator.PublishOnUIThreadAsync(new AddKeyMessage { ParentDatabase = GetParentDatabase, KeyBase = KeyName });
         }
     }
 }

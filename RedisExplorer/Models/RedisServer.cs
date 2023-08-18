@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-
+using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using RedisExplorer.Messages;
 using RedisExplorer.Properties;
@@ -42,7 +43,7 @@ namespace RedisExplorer.Models
                 }
                 catch (RedisConnectionException rcException)
                 {
-                    eventAggregator.PublishOnUIThread(new ConnectionFailedMessage { ErrorMessage = rcException.Message });
+                    eventAggregator.PublishOnUIThreadAsync(new ConnectionFailedMessage { ErrorMessage = rcException.Message });
                     return null;
                 }
             }
@@ -72,7 +73,7 @@ namespace RedisExplorer.Models
             return Connection.GetDatabase(dbnumber);
         }
 
-        protected override void LoadChildren()
+        protected override async void LoadChildren()
         {
             var server = GetServer();
 
@@ -98,7 +99,7 @@ namespace RedisExplorer.Models
                             }
                             else
                             {
-                                eventAggregator.PublishOnUIThread(new InfoNotValidMessage());                                
+                                await eventAggregator.PublishOnUIThreadAsync(new InfoNotValidMessage());                                
                             }
 
                             var db = new RedisDatabase(this, dbnumber, eventAggregator, keycount);
@@ -110,16 +111,16 @@ namespace RedisExplorer.Models
             }
         }
 
-        public void Reload()
+        public async void Reload()
         {
             Children.Clear();
 
-            eventAggregator.PublishOnUIThread(new ServerReloadMessage { Name = Display });
+            await eventAggregator.PublishOnUIThreadAsync(new ServerReloadMessage { Name = Display });
 
             LoadChildren();
         }
 
-        public void Delete(RedisServer server)
+        public async void Delete(RedisServer server)
         {
             if (Settings.Default.Servers != null)
             {
@@ -128,11 +129,11 @@ namespace RedisExplorer.Models
                 Settings.Default.Servers = servers;
                 Settings.Default.Save();
 
-                eventAggregator.PublishOnUIThread(new DeleteConnectionMessage());
+                await eventAggregator.PublishOnUIThreadAsync(new DeleteConnectionMessage());
             }
         }
 
-        public void Handle(FlushDbMessage message)
+        public async Task HandleAsync(FlushDbMessage message,CancellationToken ct)
         {
             Children.Clear();
             LoadChildren();

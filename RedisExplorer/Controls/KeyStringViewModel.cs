@@ -5,6 +5,8 @@ using Newtonsoft.Json.Linq;
 using RedisExplorer.Interface;
 using RedisExplorer.Messages;
 using RedisExplorer.Models;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RedisExplorer.Controls
 {
@@ -32,7 +34,7 @@ namespace RedisExplorer.Controls
 
         #region Message Handlers
 
-        public void Handle(TreeItemSelectedMessage message)
+        public async Task HandleAsync(TreeItemSelectedMessage message, CancellationToken ct)
         {
             if (message?.SelectedItem is RedisKeyString && !message.SelectedItem.HasChildren)
             {
@@ -40,12 +42,12 @@ namespace RedisExplorer.Controls
             }
         }
 
-        public void Handle(AddKeyMessage message)
+        public async Task HandleAsync(AddKeyMessage message, CancellationToken ct)
         {
             KeyValue = string.Empty;
         }
 
-        public void Handle(RedisKeyReloadMessage message)
+        public async Task HandleAsync(RedisKeyReloadMessage message, CancellationToken ct)
         {
             var redisKeyString = message.Item as RedisKeyString;
             if (redisKeyString != null)

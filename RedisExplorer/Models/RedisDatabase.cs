@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using RedisExplorer.Messages;
 using RedisExplorer.Properties;
@@ -94,29 +96,29 @@ namespace RedisExplorer.Models
             }
         }
         
-        public void Reload()
+        public async void Reload()
         {
-            eventAggregator.PublishOnUIThread(new DatabaseReloadMessage { DbNumber = dbNumber });
+            await eventAggregator.PublishOnUIThreadAsync(new DatabaseReloadMessage { DbNumber = dbNumber });
 
             ReloadDatabase();
         }
 
-        public void Flush()
+        public async void Flush()
         {
             var s = parent.GetServer();
             s.FlushDatabase(dbNumber);
 
-            eventAggregator.PublishOnUIThread(new FlushDbMessage { DbNumber = dbNumber });
+           await  eventAggregator.PublishOnUIThreadAsync(new FlushDbMessage { DbNumber = dbNumber });
             
             ReloadDatabase();
         }
 
-        public void Add()
+        public async void Add()
         {
-            eventAggregator.PublishOnUIThread(new AddKeyMessage { ParentDatabase = this });
+            await eventAggregator.PublishOnUIThreadAsync(new AddKeyMessage { ParentDatabase = this });
         }
 
-        public void Handle(RedisKeyUpdatedMessage message)
+        public async Task HandleAsync(RedisKeyUpdatedMessage message,CancellationToken ct)
         {
             if (dbNumber == message.Key.DatabaseName)
             {
@@ -126,7 +128,7 @@ namespace RedisExplorer.Models
             }
         }
 
-        public void Handle(RedisKeyAddedMessage message)
+        public async Task HandleAsync(RedisKeyAddedMessage message, CancellationToken ct)
         {
             if (dbNumber == message.Key.DatabaseName)
             {
@@ -136,7 +138,7 @@ namespace RedisExplorer.Models
             }
         }
         
-        public void Handle(KeyDeletedMessage message)
+        public async Task HandleAsync(KeyDeletedMessage message,CancellationToken ct)
         {
             if (dbNumber == message.Key.DatabaseName)
             {
@@ -145,11 +147,11 @@ namespace RedisExplorer.Models
                 var patharr = message.Key.KeyName.Split(new[] { urnSeparator }, StringSplitOptions.RemoveEmptyEntries);
                 ExpandChildNode(Children, patharr.Take(patharr.Length - 1).ToList());
 
-                eventAggregator.PublishOnUIThread(new AddKeyMessage { ParentDatabase = this });
+                await eventAggregator.PublishOnUIThreadAsync(new AddKeyMessage { ParentDatabase = this });
             }
         }
 
-        public void Handle(KeysDeletedMessage message)
+        public async Task HandleAsync(KeysDeletedMessage message, CancellationToken ct)
         {
             if (dbNumber == message.DatabaseName)
             {
@@ -161,7 +163,7 @@ namespace RedisExplorer.Models
                     var patharr = akey.Split(new[] { urnSeparator }, StringSplitOptions.RemoveEmptyEntries);
                     ExpandChildNode(Children, patharr.Take(patharr.Length - 1).ToList());
 
-                    eventAggregator.PublishOnUIThread(new AddKeyMessage { ParentDatabase = this });
+                   await  eventAggregator.PublishOnUIThreadAsync(new AddKeyMessage { ParentDatabase = this });
                 }
             }
         }

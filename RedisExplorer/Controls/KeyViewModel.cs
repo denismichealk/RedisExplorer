@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 
 using RedisExplorer.Interface;
@@ -197,7 +199,7 @@ namespace RedisExplorer.Controls
             Items.Add(KeyHashViewModel);
             Items.Add(KeySortedSetViewModel);
 
-            ActivateItem(KeyStringViewModel);
+             ActivateItemAsync(KeyStringViewModel);
 
             //ActivateItem(new DefaultViewModel());
 
@@ -282,7 +284,7 @@ namespace RedisExplorer.Controls
             item?.Delete();
         }
 
-        public void ReloadButton()
+        public async void ReloadButton()
         {
             if (item == null)
             {
@@ -290,7 +292,7 @@ namespace RedisExplorer.Controls
             }
             item.Reload();
 
-            eventAggregator.PublishOnUIThread(new RedisKeyReloadMessage { Item = item });
+            await eventAggregator.PublishOnUIThreadAsync(new RedisKeyReloadMessage { Item = item });
 
             resetValue = false;
             
@@ -316,7 +318,7 @@ namespace RedisExplorer.Controls
 
         #region Message Handlers
 
-        public void Handle(TreeItemSelectedMessage message)
+        public async Task HandleAsync(TreeItemSelectedMessage message,CancellationToken ct)
         {
             if (message?.SelectedItem is RedisKey && !message.SelectedItem.HasChildren)
             {
@@ -328,7 +330,7 @@ namespace RedisExplorer.Controls
             }
         }
 
-        public void Handle(AddKeyMessage message)
+        public async Task HandleAsync(AddKeyMessage message, CancellationToken ct)
         {
             item = new RedisKeyString(message.ParentDatabase, eventAggregator) { KeyValue = string.Empty };
             SetDefault();
@@ -390,7 +392,7 @@ namespace RedisExplorer.Controls
                     item.TTL = olditem.TTL;
                     item.Display = olditem.KeyName;
 
-                    ActivateItem(redisTypeViewModelMap[selectedType]);
+                    ActivateItemAsync(redisTypeViewModelMap[selectedType]);
 
                     if (resetValue)
                     {

@@ -71,7 +71,7 @@ namespace RedisExplorer.Controls
 
         #region Button Actions
 
-        public void SaveButton()
+        public async void SaveButton()
         {
             var connection = new RedisConnection
                              {
@@ -80,7 +80,7 @@ namespace RedisExplorer.Controls
                                  Port = int.Parse(PortTextBox)
                              };
 
-            eventAggregator.PublishOnUIThread(new AddConnectionMessage { Connection = connection });
+            await eventAggregator.PublishOnUIThreadAsync(new AddConnectionMessage { Connection = connection });
 
             TryClose();
         }

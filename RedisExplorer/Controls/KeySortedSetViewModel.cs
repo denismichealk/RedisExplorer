@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using RedisExplorer.Interface;
 using RedisExplorer.Messages;
@@ -28,7 +30,7 @@ namespace RedisExplorer.Controls
         
         #region Message handlers
 
-        public void Handle(TreeItemSelectedMessage message)
+        public async Task HandleAsync(TreeItemSelectedMessage message,CancellationToken ct)
         {
             if (message?.SelectedItem is RedisKeySortedSet && !message.SelectedItem.HasChildren)
             {
@@ -36,12 +38,12 @@ namespace RedisExplorer.Controls
             }
         }
 
-        public void Handle(AddKeyMessage message)
+        public async Task HandleAsync(AddKeyMessage message, CancellationToken ct)
         {
             KeyValue = new BindableCollection<ScoreWrapper>();
         }
 
-        public void Handle(RedisKeyReloadMessage message)
+        public async Task HandleAsync(RedisKeyReloadMessage message, CancellationToken ct)
         {
             var redisKeySortedSet = message.Item as RedisKeySortedSet;
             if (redisKeySortedSet != null)

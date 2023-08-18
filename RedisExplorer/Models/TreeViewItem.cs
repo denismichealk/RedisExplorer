@@ -62,14 +62,14 @@ namespace RedisExplorer.Models
 
                 if (isExpanded && HasChildren)
                 {
-                    eventAggregator.PublishOnUIThread(new TreeItemExpandedMessage { SelectedItem = this });
+                    eventAggregator.PublishOnUIThreadAsync(new TreeItemExpandedMessage { SelectedItem = this });
                 }
 
                 NotifyOfPropertyChange(() => IsExpanded);
             }
         }
 
-        public virtual bool IsSelected
+        public  virtual  bool IsSelected
         {
             get { return isSelected; }
             set
@@ -84,7 +84,7 @@ namespace RedisExplorer.Models
                 
                 if (isSelected)
                 {
-                    eventAggregator.PublishOnUIThread(new TreeItemSelectedMessage { SelectedItem = this });
+                     eventAggregator.PublishOnUIThreadAsync(new TreeItemSelectedMessage { SelectedItem = this });
                 }
 
                 NotifyOfPropertyChange(() => IsSelected);
